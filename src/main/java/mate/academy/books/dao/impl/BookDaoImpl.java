@@ -49,9 +49,12 @@ public class BookDaoImpl implements BookDao {
     @Override
     public List<Book> getByAuthor(Author author) {
         try (var session = HibernateUtil.getSessionFactory().openSession()) {
-            var query = session.createQuery("from Book where :author in authors");
-            query.setParameter("author", author);
-            return query.getResultList();
+            var criteriaBuilder = session.getCriteriaBuilder();
+            var query = criteriaBuilder.createQuery(Book.class);
+            var root = query.from(Book.class);
+            query.select(root)
+                    .where(criteriaBuilder.isMember(author, root.get("authors")));
+            return session.createQuery(query).getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("Can't retrieve books.", e);
         }

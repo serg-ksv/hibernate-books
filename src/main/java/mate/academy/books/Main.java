@@ -38,5 +38,6 @@ public class Main {
 
         System.out.println(bookService.getByTitle("The road"));
         bookService.getByGenre(fantasy).forEach(System.out::println);
+        bookService.getByAuthor(pratchett).forEach(System.out::println);
     }
 }
