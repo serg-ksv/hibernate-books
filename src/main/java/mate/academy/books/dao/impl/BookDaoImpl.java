@@ -38,9 +38,12 @@ public class BookDaoImpl implements BookDao {
     @Override
     public Book getByTitle(String title) {
         try (var session = HibernateUtil.getSessionFactory().openSession()) {
-            var query = session.createQuery("from Book where title = :title");
-            query.setParameter("title", title);
-            return (Book) query.getSingleResult();
+            var criteriaBuilder = session.getCriteriaBuilder();
+            var query = criteriaBuilder.createQuery(Book.class);
+            var root = query.from(Book.class);
+            var predicate = criteriaBuilder.equal(root.get("title"), title);
+            query.select(root).where(predicate);
+            return session.createQuery(query).getSingleResult();
         } catch (Exception e) {
             throw new DataProcessingException("Can't retrieve book.", e);
         }
@@ -63,9 +66,12 @@ public class BookDaoImpl implements BookDao {
     @Override
     public List<Book> getByGenre(Genre genre) {
         try (var session = HibernateUtil.getSessionFactory().openSession()) {
-            var query = session.createQuery("from Book where genre = :genre");
-            query.setParameter("genre", genre);
-            return query.getResultList();
+            var criteriaBuilder = session.getCriteriaBuilder();
+            var query = criteriaBuilder.createQuery(Book.class);
+            var root = query.from(Book.class);
+            var predicate = criteriaBuilder.equal(root.get("genre"), genre);
+            query.select(root).where(predicate);
+            return session.createQuery(query).getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("Can't retrieve books.", e);
         }
